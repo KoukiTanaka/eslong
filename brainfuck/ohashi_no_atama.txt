@@ -1,0 +1,136 @@
+///
+///大橋脳内言語変換プログラム.c
+///
+///brainfuckを扱いやすくするため
+///脳死で拡張言語を作ってみました
+///参考にどうぞ
+///
+///使い方
+///1.このプログラムを起動
+///2.大橋脳内言語で作った文を貼り付けよう
+///3.出力された文をコピペして脳死で動かしてみよう
+///
+///注意
+///1.エラー処理は面倒だから入れてないので書き方間違えてもわからない
+///2.プログラムも出力も汚い
+///3.出力された文は下手にいじると壊れる
+///4.容量4倍食う
+///
+///brainfuckから追加
+/// ![  whilenot入口(値が0なら入る)
+/// !]  whilenot出口(値が0なら出る)
+/// {   if入口(0以外なら入る)
+/// }   if出口(そのまま出る)
+/// !{  ifnot入口(0なら入る)
+/// !}  ifnot出口(そのまま出る)
+/// :   現在のアドレスをクリップ
+/// ;   クリップされたアドレスの値に飛ぶ
+/// &   現在の値にそったアドレスに飛ぶ(00-ff)
+/// "   次の文字の値ぶんインクリメント(0の時に"Aとすると'A'が入る )
+///
+
+#include <stdio.h>
+
+#define START "->>>>--<<<"
+
+#define INC_VALUE "+"
+#define DEC_VALUE "-"
+#define INC_ADDR ">>>>"
+#define DEC_ADDR "<<<<"
+#define WHILE_IN "["
+#define WHILE_OUT "]"
+#define INPUT ","
+#define OUTPUT "."
+
+#define WHILE_NOT_IN ">>>>>+<<<<<[>]>>>>>[-[+<-]<<<<<"
+#define WHILE_NOT_OUT ">>>>>+<<<<<[>]>>>>>]-[+<-]<<<<<"
+#define IF_IN ">>+<<[>]>[-[+>-]<<"
+#define IF_OUT ">>+<]-[+>-]<<"
+#define IF_NOT_IN ">>>>>+<<<<<[>]>>>>>[-[+<-]<<<<<"
+#define IF_NOT_OUT ">>>>>+>]-[+<-]<<<<<"
+#define ADDR_CRIP ">>>--[-<<<<+]+[-->>>>++]+[-<<<<+]++[--->>>>+++]--<<<"
+#define CRIP_ADDR_JUMP ">>>+[-<<<<+]+[-->>>>++]--<<<"
+#define VALUE_ADDR_JUMP ">>-<<[->++[-<+]->>++[->+]-<<]>[-<+>]>++[-<+]->>[[->>>>+<<<<]>>>>-]<"
+
+int main()
+{
+    char moji = 0;
+    char ex_f = 0;
+    printf(START);
+    while((moji = getchar()) != EOF){
+        if(ex_f == 0){
+            switch(moji){
+            case '+':
+                printf(INC_VALUE);
+                break;
+            case '-':
+                printf(DEC_VALUE);
+                break;
+            case '>':
+                printf(INC_ADDR);
+                break;
+            case '<':
+                printf(DEC_ADDR);
+                break;
+            case '[':
+                printf(WHILE_IN);
+                break;
+            case ']':
+                printf(WHILE_OUT);
+                break;
+            case ',':
+                printf(INPUT);
+                break;
+            case '.':
+                printf(OUTPUT);
+                break;
+            case '{':
+                printf(IF_IN);
+                break;
+            case '}':
+                printf(IF_OUT);
+                break;
+            case ':':
+                printf(ADDR_CRIP);
+                break;
+            case ';':
+                printf(CRIP_ADDR_JUMP);
+                break;
+            case '&':
+                printf(VALUE_ADDR_JUMP);
+                break;
+            case '"':
+                ex_f = 2;
+                break;
+            case '!':
+                ex_f = 1;
+                break;
+            default:
+                printf("%c",moji);
+                break;
+            }
+        }else if(ex_f == 1){
+            switch(moji){
+            case '[':
+                printf(WHILE_NOT_IN);
+                break;
+            case ']':
+                printf(WHILE_NOT_OUT);
+                break;
+            case '{':
+                printf(IF_NOT_IN);
+                break;
+            case '}':
+                printf(IF_NOT_OUT);
+                break;
+            default:
+                printf("%c",moji);
+                break;
+            }
+            ex_f = 0;
+        }else{
+            while(moji--)printf("+");
+            ex_f = 0;
+        }
+    }
+}
